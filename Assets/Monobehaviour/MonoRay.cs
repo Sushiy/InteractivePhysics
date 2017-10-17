@@ -8,7 +8,7 @@ public class MonoRay : MonoBehaviour
     public Vector3 Origin { get { return m_transOrigin.position ; } }
 
     Transform m_transDirection;
-    public Vector3 Direction { get { return m_transDirection.position - m_transOrigin.position; } }
+    public Vector3 Direction { get { return (m_transDirection.position - m_transOrigin.position).normalized; } }
 
     public float tMin, tMax;
 
@@ -19,6 +19,11 @@ public class MonoRay : MonoBehaviour
     {
         m_transOrigin = transform.GetChild(0);
         m_transDirection = transform.GetChild(1);
+    }
+
+    public Vector3 GetPointOnRay(float t)
+    {
+        return Origin + Direction * t;
     }
 
     void OnDrawGizmos()

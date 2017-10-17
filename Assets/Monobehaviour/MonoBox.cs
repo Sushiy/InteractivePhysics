@@ -12,6 +12,7 @@ public class MonoBox : MonoBehaviour
     [SerializeField]
     Vector3 m_v3Size;
     public Vector3 Size { get { return m_v3Size; } }
+
     [SerializeField]
     Color m_color = Color.white;
 
@@ -22,11 +23,47 @@ public class MonoBox : MonoBehaviour
     bool drawMikowski = true;
 
     Vector3[] corners;
+    public Vector3[] Corners { get { return corners; } }
 
-    public Vector3 AABBSize { get { return new Vector3(m_v3Size.x + 2 * aabb, m_v3Size.y + 2 * aabb, m_v3Size.z + aabb); } }
+    Vector3[] aabbCorners;
+    public Vector3[] AABBCorners { get { return aabbCorners; } }
+
+    public Vector3 AABBSize { get { return new Vector3(m_v3Size.x + 2.0f * aabb, m_v3Size.y + 2.0f * aabb, m_v3Size.z + 2.0f * aabb); } }
+    public float AABBRadius { get { return aabb; } }
+
+    private void Awake()
+    {
+        corners = new Vector3[] {
+            Center + new Vector3(Size.x / 2, Size.y / 2, Size.z / 2),
+            Center + new Vector3(Size.x / 2, Size.y / 2, -Size.z / 2),
+            Center + new Vector3(-Size.x / 2, Size.y / 2, Size.z / 2),
+            Center + new Vector3(-Size.x / 2, Size.y / 2, -Size.z / 2),
+
+            Center + new Vector3(Size.x / 2, -Size.y / 2, Size.z / 2),
+            Center + new Vector3(Size.x / 2, -Size.y / 2, -Size.z / 2),
+            Center + new Vector3(-Size.x / 2, -Size.y / 2, Size.z / 2),
+            Center + new Vector3(-Size.x / 2, -Size.y / 2, -Size.z / 2)
+        };
+
+        aabbCorners = new Vector3[]
+        {
+            Center + new Vector3(AABBSize.x, AABBSize.y, AABBSize.z) * 0.5f,
+            Center + new Vector3(AABBSize.x, AABBSize.y, -AABBSize.z) * 0.5f,
+            Center + new Vector3(-AABBSize.x, AABBSize.y, AABBSize.z) * 0.5f,
+            Center + new Vector3(-AABBSize.x, AABBSize.y, -AABBSize.z) * 0.5f,
+
+            Center + new Vector3(AABBSize.x, -AABBSize.y, AABBSize.z) * 0.5f,
+            Center + new Vector3(AABBSize.x, -AABBSize.y, -AABBSize.z) * 0.5f,
+            Center + new Vector3(-AABBSize.x, -AABBSize.y, AABBSize.z) * 0.5f,
+            Center + new Vector3(-AABBSize.x, -AABBSize.y, -AABBSize.z) * 0.5f
+
+        };
+    }
 
     public void OnDrawGizmos()
     {
+        if (corners == null) Awake();
+
         //set Boxcolor
         Gizmos.color = m_color;
 
@@ -37,17 +74,25 @@ public class MonoBox : MonoBehaviour
         //Draw AABB
         Gizmos.DrawWireCube(Center, AABBSize);
 
-        DebugExtension.DrawCylinder(Center + Size/2, Center + new Vector3(-Size.x/2, Size.y/2, Size.z/2), Color.green, 1.0f);
+        Gizmos.color = Color.blue;
+        DebugExtension.DrawCylinder(corners[0], corners[1], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[0], corners[2], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[3], corners[1], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[3], corners[2], Color.blue, 1.0f);
+
+        DebugExtension.DrawCylinder(corners[4], corners[5], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[4], corners[6], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[7], corners[5], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[7], corners[6], Color.blue, 1.0f);
+
+        DebugExtension.DrawCylinder(corners[0], corners[4], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[1], corners[5], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[2], corners[6], Color.blue, 1.0f);
+        DebugExtension.DrawCylinder(corners[3], corners[7], Color.blue, 1.0f);
 
         //Draw All Corners
-        Gizmos.DrawWireSphere(Center + Size/2, 1.0f);
-        Gizmos.DrawWireSphere(Center - Size/2, 1.0f);
-        Gizmos.DrawWireSphere(Center + new Vector3(-Size.x / 2, Size.y / 2, Size.z / 2), 1.0f);
-        Gizmos.DrawWireSphere(Center + new Vector3(-Size.x / 2, Size.y / 2, -Size.z / 2), 1.0f);
-        Gizmos.DrawWireSphere(Center + new Vector3(-Size.x / 2, -Size.y / 2, Size.z / 2), 1.0f);
-        Gizmos.DrawWireSphere(Center + new Vector3(Size.x / 2, -Size.y / 2, Size.z / 2), 1.0f);
-        Gizmos.DrawWireSphere(Center + new Vector3(Size.x / 2, -Size.y / 2, -Size.z / 2), 1.0f);
-        Gizmos.DrawWireSphere(Center + new Vector3(Size.x / 2, Size.y / 2, -Size.z / 2), 1.0f);
+        foreach (Vector3 v3 in corners)
+            Gizmos.DrawWireSphere(v3, AABBRadius);
 
 
         //Reset Color to standardvalue
