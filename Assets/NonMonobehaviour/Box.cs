@@ -9,6 +9,7 @@ public class Box
     public Vector3 Center
     {
         get { return center; }
+        set { center = value; }
     }
     Vector3 size;
     public Vector3 Size
