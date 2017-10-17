@@ -21,8 +21,12 @@ public class MonoMain : MonoBehaviour {
 
     private void OnDrawGizmos()
     {
-        if (RayAABBIntersection(ref r, b, out hitpoint)) ;
-            //Gizmos.DrawWireSphere(hitpoint, 0.25f);
+        if (RayAABBIntersection(ref r, b, out hitpoint))
+        {
+            Gizmos.color = Color.grey;
+            Gizmos.DrawSphere(hitpoint, 1.0f);
+            Gizmos.color = Color.white;
+        }
     }
 
     bool RayAABBIntersection(ref MonoRay _ray, MonoBox _box, out Vector3 _hitpoint)
