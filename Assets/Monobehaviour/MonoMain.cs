@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MonoMain : MonoBehaviour {
 
     public MonoBox b;
     public MonoRay r;
+    public Text debugText;
 
     Vector3 hitpoint;
     // Use this for initialization
@@ -16,6 +18,11 @@ public class MonoMain : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            float t;
+            RayCylinderIntersection(r, b.Corners[0], b.Corners[4], 1, out t);
+        }
     }
 
 
@@ -24,11 +31,20 @@ public class MonoMain : MonoBehaviour {
         if (RayAABBIntersection(ref r, b, out hitpoint))
         {
             Gizmos.color = Color.red;
-            if (CheckEdgeCase(r, b, ref hitpoint))
+            bool hitEdgeCapsule;
+            if (CheckEdgeCase(r, b, ref hitpoint, out hitEdgeCapsule))
             {
-                Gizmos.color = Color.yellow;
+                if(hitEdgeCapsule)
+                {
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawSphere(hitpoint, 1.0f);
+                }
             }
-            Gizmos.DrawSphere(hitpoint, 1.0f);
+            else
+            {
+                Gizmos.DrawSphere(hitpoint, 1.0f);
+            }
+            Gizmos.DrawWireSphere(hitpoint, 1.0f);
             Gizmos.color = Color.white;
         }
 
@@ -82,102 +98,123 @@ public class MonoMain : MonoBehaviour {
         return true;
     }
 
-    bool CheckEdgeCase(MonoRay _ray, MonoBox _box, ref Vector3 _hitpoint)
+    bool CheckEdgeCase(MonoRay _ray, MonoBox _box, ref Vector3 _hitpoint, out bool _hitEdgeCapsule)
     {
         //Check if we are closer than radius to any corner
         float t = 0;
-        bool b = false;
+        bool hitEdgeCapsule = false;
 
         //Upper Edges
+        float closestDistance = Mathf.Infinity;
         float distance = DistancePointEdge(_hitpoint, _box.AABBCorners[0], _box.AABBCorners[1]);
+        if (distance < closestDistance) closestDistance = distance;
         if (distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[0], _box.Corners[1], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[0], _box.AABBCorners[2]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[0], _box.Corners[2], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[3], _box.AABBCorners[1]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[3], _box.Corners[1], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[3], _box.AABBCorners[2]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[3], _box.Corners[2], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
 
         //Lower Edges
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[4], _box.AABBCorners[5]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[4], _box.Corners[5], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[4], _box.AABBCorners[6]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[4], _box.Corners[6], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[7], _box.AABBCorners[5]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[7], _box.Corners[5], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[7], _box.AABBCorners[6]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if(RayCapsuleIntersection(_ray, _box.Corners[7], _box.Corners[6], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
 
         //Standing Edges
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[0], _box.AABBCorners[4]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if (RayCapsuleIntersection(_ray, _box.Corners[0], _box.Corners[4], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[1], _box.AABBCorners[5]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if (RayCapsuleIntersection(_ray, _box.Corners[1], _box.Corners[5], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[2], _box.AABBCorners[6]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
             if (RayCapsuleIntersection(_ray, _box.Corners[2], _box.Corners[6], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
         distance = DistancePointEdge(_hitpoint, _box.AABBCorners[3], _box.AABBCorners[7]);
-        if (!b && distance <= _box.AABBRadius)
+        if (distance < closestDistance) closestDistance = distance;
+        if (!hitEdgeCapsule && distance <= _box.AABBRadius)
         {
+            Debug.Log("Closest to capsule 3|7");
             if (RayCapsuleIntersection(_ray, _box.Corners[3], _box.Corners[7], _box.AABBRadius, out t))
-                b = true;
+                hitEdgeCapsule = true;
         }
 
-        if (b)
+        debugText.text = ("Closest Dist:" + closestDistance + "/" + _box.AABBRadius + "|" + hitEdgeCapsule);
+
+        if (hitEdgeCapsule)
         {
-            hitpoint = _ray.GetPointOnRay(t);
-            return true;
+            hitpoint = _ray.GetPointOnRay(t);        
         }
-        else
-            return false;
+        _hitEdgeCapsule = hitEdgeCapsule;
+        //Tell me if this was an edgecase
+        return closestDistance <= _box.AABBRadius;
     }
 
     bool RayCapsuleIntersection(MonoRay _ray, Vector3 _edge0, Vector3 _edge1, float _radius, out float t)
     {
         float t0 = 0;
+        if(RayCylinderIntersection(_ray, _edge0, _edge1, _radius, out t0))
+        {
+            t = t0;
+            return true;
+        }
         if (RaySphereIntersection(_ray, _edge0, _radius, out t0) || RaySphereIntersection(_ray, _edge1, _radius, out t0))
         {
             t = t0;
@@ -190,9 +227,61 @@ public class MonoMain : MonoBehaviour {
         }
     }
 
+    bool RayCylinderIntersection(MonoRay _ray, Vector3 _edge0, Vector3 _edge1, float _radius, out float t)
+    {
+        t = 0;
+
+
+        //Define fixed CoordinateSystem
+        Vector3 z = (_edge1 - _edge0).normalized;
+        Vector3 y = Vector3.up;
+        if (z.y != 0)
+        {
+            y = Vector3.forward;
+        }
+        Vector3 x = Vector3.Cross(z, y).normalized;
+            //CoordinateSystemMatrix
+        Matrix4x4 C = new Matrix4x4(new Vector4(x.x, x.y, x.z, 0), new Vector4(y.x, y.y, y.z, 0), new Vector4(z.x, z.y, z.z, 0), new Vector4(0,0,0,1));
+        //Debug.Log("Matrix C:\n" + C);
+
+        //Transform Ray and Cylinder to fixed Coordinatesystem (capsule along z axis)
+        Vector3 originC = C * _ray.Origin;
+        Vector3 dirC = C * _ray.Direction;
+
+        Vector3 edge0C = C * _edge0;
+        Vector3 edge1C = C * _edge1;
+        if (edge0C.z > edge1C.z)
+            Swap(ref edge0C, ref edge1C);
+        //Debug.Log("edge0:" + _edge0 + "|" + edge0C);
+        //Debug.Log("edge1:" + _edge1 + "|" + edge1C);
+
+        //Project to z-Axis
+
+        Vector2 edge0CP = new Vector2(edge0C.x, edge0C.y);
+        Vector2 edge1CP = new Vector2(edge1C.x, edge1C.y);
+
+        Vector2 originCP = new Vector2(originC.x, originC.y);
+        Vector2 dirCP = new Vector2(dirC.x, dirC.y);
+
+        //Ray Circle Check
+        if(RayCircleIntersection(originCP, dirCP, edge0CP, 1, out t))
+        {
+            //Debug.Log("CircleIntersection");
+            //Interval Check
+            Vector3 pC = originC + dirC * t;
+            if (pC.z > edge1C.z || pC.z < edge0C.z)
+            {
+                //Debug.Log("out of Interval");
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     bool RaySphereIntersection(MonoRay _ray, Vector3 _center, float _radius, out float t)
     {
-        t = -1;
+        t = 0;
         //Solutions for t if the ray intersects the sphere
         float t0, t1;
         Vector3 L = _ray.Origin - _center;
@@ -212,21 +301,26 @@ public class MonoMain : MonoBehaviour {
         return true;
     }
 
-    bool RayCornerSphereIntersection(MonoRay _ray, MonoBox _box, out Vector3 hitpoint)
+    //Same as Sphere but with Vector2
+    bool RayCircleIntersection(Vector2 _rayOrigin, Vector2 _rayDirection, Vector2 _center, float _radius, out float t)
     {
-        hitpoint = Vector3.zero;
-        float t = 0;
+        t = 0;
+        //Solutions for t if the ray intersects the sphere
+        float t0, t1;
+        Vector2 L = _rayOrigin - _center;
+        float a = Vector2.Dot(_rayDirection, _rayDirection);
+        float b = 2 * Vector2.Dot(_rayDirection, L);
+        float c = Vector2.Dot(L, L) - _radius * _radius;
+        if (!SolveQuadratic(a, b, c, out t0, out t1)) return false;
 
-        foreach(Vector3 corner in _box.Corners)
+        if (t0 > t1) Swap(ref t0, ref t1);
+
+        if (t0 < 0)
         {
-            if(RaySphereIntersection(_ray, corner, _box.AABBRadius, out t))
-            {
-                hitpoint = _ray.GetPointOnRay(t);
-                break;
-            }
+            t0 = t1; //if t0 is negative let's use t1 instead
+            if (t0 < 0) return false; //both t0 and t1 are negative
         }
-
-
+        t = t0;
         return true;
     }
 
@@ -262,6 +356,13 @@ public class MonoMain : MonoBehaviour {
     void Swap(ref float a, ref float b)
     {
         float tmp = a;
+        a = b;
+        b = tmp;
+    }
+
+    void Swap(ref Vector3 a, ref Vector3 b)
+    {
+        Vector3 tmp = a;
         a = b;
         b = tmp;
     }

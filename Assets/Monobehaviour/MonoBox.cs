@@ -20,7 +20,9 @@ public class MonoBox : MonoBehaviour
     float aabb;
 
     [SerializeField]
-    bool drawMikowski = true;
+    bool drawAABB = true;
+    [SerializeField]
+    bool drawMinkowski = true;
 
     Vector3[] corners;
     public Vector3[] Corners { get { return corners; } }
@@ -69,30 +71,38 @@ public class MonoBox : MonoBehaviour
 
         //DrawCube
         Gizmos.DrawCube(Center, Size);
-        //Set AABBcolor to green
-        Gizmos.color = Color.green;
+        
         //Draw AABB
-        Gizmos.DrawWireCube(Center, AABBSize);
+        if (drawAABB)
+        {
+            //Set AABBcolor to green
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(Center, AABBSize);
+        }
 
-        Gizmos.color = Color.blue;
-        DebugExtension.DrawCylinder(corners[0], corners[1], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[0], corners[2], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[3], corners[1], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[3], corners[2], Color.blue, 1.0f);
+        if(drawMinkowski)
+        {
+            Gizmos.color = Color.blue;
+            DebugExtension.DrawCylinder(corners[0], corners[1], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[0], corners[2], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[3], corners[1], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[3], corners[2], Color.blue, 1.0f);
 
-        DebugExtension.DrawCylinder(corners[4], corners[5], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[4], corners[6], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[7], corners[5], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[7], corners[6], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[4], corners[5], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[4], corners[6], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[7], corners[5], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[7], corners[6], Color.blue, 1.0f);
 
-        DebugExtension.DrawCylinder(corners[0], corners[4], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[1], corners[5], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[2], corners[6], Color.blue, 1.0f);
-        DebugExtension.DrawCylinder(corners[3], corners[7], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[0], corners[4], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[1], corners[5], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[2], corners[6], Color.blue, 1.0f);
+            DebugExtension.DrawCylinder(corners[3], corners[7], Color.blue, 1.0f);
 
-        //Draw All Corners
-        foreach (Vector3 v3 in corners)
-            Gizmos.DrawWireSphere(v3, AABBRadius);
+            //Draw All Corners
+            foreach (Vector3 v3 in corners)
+                Gizmos.DrawWireSphere(v3, AABBRadius);
+        }
+        
 
 
         //Reset Color to standardvalue
