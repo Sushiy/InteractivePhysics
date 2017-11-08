@@ -107,6 +107,7 @@ public class MonoMain : MonoBehaviour {
         //Upper Edges
         float closestDistance = Mathf.Infinity;
         float distance = DistancePointEdge(_hitpoint, _box.AABBCorners[0], _box.AABBCorners[1]);
+
         if (distance < closestDistance) closestDistance = distance;
         if (distance <= _box.AABBRadius)
         {
